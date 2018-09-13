@@ -117,7 +117,7 @@ def get_csv_chunks(CSV, chunks):
 
 
 
-def buildImuMesagge( roll, pitch, yaw, gyro, IMUStatus):
+def buildImuMesagge( roll, pitch, yaw, gyro, IMUStatus, compass, accel):
     csum = 0
     if(yaw < 0):
        heading = yaw+360
@@ -128,7 +128,7 @@ def buildImuMesagge( roll, pitch, yaw, gyro, IMUStatus):
 
     IMUMesagge = "IMU,"
 
-    IMUMesagge = IMUMesagge+str(-1*roll)+","+str(pitch)+","+str(heading)+","+str(yawrate)+","+IMUStatus
+    IMUMesagge = IMUMesagge+str(-1*roll)+","+str(pitch)+","+str(heading)+","+str(yawrate)+","+str(compass)+","+str(accel)+","+IMUStatus
     #PAOGI = PAOGI+str(round(math.degrees(fusionPose[0]),2))+","+str(round(math.degrees(fusionPose[1]),2))+","+str(heading)+","+str(yawrate)+","+IMUStatus+","
     
 #compute and append checksum
@@ -154,6 +154,8 @@ if __name__ == "__main__":
                 fusionPose = data["fusionPose"]
                 IMUStatus = data["fusionPoseValid"]
                 gyro = data["gyro"]
+                compass = data["compass"]
+                accel = data["accel"]
                 #yaw = math.degrees(fusionPose[2])-90  ## this is in to match BNO on my mounting box.
                 yaw = round(math.degrees(fusionPose[2]),2)
                 if(yaw < 0):
@@ -169,7 +171,7 @@ if __name__ == "__main__":
                     Xp = KalRoll
                     Zp = Xp
                     KalRoll = (G*(roll-Zp))+Xp
-                    IMUMesagge = buildImuMesagge(KalRoll, pitch, yaw, gyro, IMUStatus) 
+                    IMUMesagge = buildImuMesagge(KalRoll, pitch, yaw, gyro, IMUStatus, compass, accel) 
                     
                     message = IMUMesagge+'\r\n'
                     
@@ -208,7 +210,7 @@ if __name__ == "__main__":
                         started_file = True
                         file_name = ("./datafiles/data_"+str(now.month)+ "_"+str(now.day)+"_"+str(now.hour)+"_"+str(now.minute)+".csv")
                         with open(file_name, 'w') as text_file:
-                            text_file.write("PAOGI, UTCseconds, Lat, LatDir, Lon, LonDir, FixQual, Sats, HDOP, Alt, AltUnits, DGPS Age, Spd_KPH, Hdg_True, IMU_HDG_True, Roll_Kal, Pitch, Yaw_rate, IMU_Status, Roll"+ '\n')
+                            text_file.write("PAOGI, Roll_Kal, Pitch, Yaw_rate, compass, accel, IMU_Status, Roll"+ '\n')
                     save_to_file = not save_to_file
                     print "Save to file is set to: ", save_to_file
                 elif (keystroke == 'debug'):

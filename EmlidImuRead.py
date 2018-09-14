@@ -6,10 +6,7 @@ import os.path
 import time
 import math
 import socket
-import select
 
-#import utm
-#import pynmea2
 from datetime import datetime
 
 
@@ -17,7 +14,7 @@ update_rate = 100.0 # Hz
 last_update = 0.0
 last_print = 0.0
 
-#IP and Port for the computer ros
+#IP and Port for the computer 
 UDP_IP = '192.168.88.10'
 UDP_PORT = 9999
 
@@ -128,9 +125,8 @@ def buildImuMesagge( roll, pitch, yaw, gyro, IMUStatus, compass, accel):
 
     IMUMesagge = "IMU,"
 
-    IMUMesagge = IMUMesagge+str(-1*roll)+","+str(pitch)+","+str(heading)+","+str(yawrate)+","+str(compass)+","+str(accel)+","+IMUStatus
-    #PAOGI = PAOGI+str(round(math.degrees(fusionPose[0]),2))+","+str(round(math.degrees(fusionPose[1]),2))+","+str(heading)+","+str(yawrate)+","+IMUStatus+","
-    
+    IMUMesagge = IMUMesagge+str(-1*roll)+","+str(pitch)+","+str(heading)+","+str(yawrate)+","+str(gyro)+","+str(compass)+","+str(accel)+","+IMUStatus
+
 #compute and append checksum
     for c in IMUMesagge:
         csum ^= ord(c)
@@ -185,42 +181,7 @@ if __name__ == "__main__":
                    
                     last_print = now
                     
-#                    if (save_to_file == True and started_file == True):
-#                        with open(file_name, 'a') as text_file:
-#                            text_file.write (output_string[:-4]+ str(roll)+"\r\n")
 
-#Bit of code to monitor keyboard input (works over SSH) and set variable based on what has been typed in
-                            #Just type in teh codes and press enter while the system running.  You want' be able to easily see
-                            #what is types in as teh messages will keep running over teh keyboard input.
-                            
-            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-                keystroke = sys.stdin.readline().rstrip()
-                print "You entered", keystroke
-                if keystroke == "m":
-                    print_messages = not print_messages
-                    print "Display messages on screen set to:", print_messages
-                elif keystroke == "X":
-                    print "Exiting Program"
-
-                    running = False
-                    break
-                elif (keystroke == 's'):
-                    if started_file == False:
-                        now=datetime.now()
-                        started_file = True
-                        file_name = ("./datafiles/data_"+str(now.month)+ "_"+str(now.day)+"_"+str(now.hour)+"_"+str(now.minute)+".csv")
-                        with open(file_name, 'w') as text_file:
-                            text_file.write("PAOGI, Roll_Kal, Pitch, Yaw_rate, compass, accel, IMU_Status, Roll"+ '\n')
-                    save_to_file = not save_to_file
-                    print "Save to file is set to: ", save_to_file
-                elif (keystroke == 'debug'):
-                    debugging = not debugging
-                elif (keystroke.split("=")[0] == 'varp'):
-                    varProcess = float(keystroke.split("=")[1])
-
-                else:
-                    print "you entered: ", keystroke, "  No action being taken"
-#Brief sleep timer to reduce CPU load.  Runs at approximately 100 Hz
             time.sleep(0.009)
             
     except KeyboardInterrupt:
